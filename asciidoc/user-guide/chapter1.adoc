@@ -1,5 +1,6 @@
-// OBS User Guide
+// OBS User Guide, Chapter One
 
+[#obs-user-chapter-one]
 = Chapter One
 
 This is Chapter One of the OBS User Guide

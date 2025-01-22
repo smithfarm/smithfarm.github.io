@@ -23,7 +23,9 @@ endif::[]
 [partintro]
 Here it is, the OBS User Guide.
 
-include::../user-guide/user.adoc[leveloffset=+1]
+include::../user-guide/chapter1.adoc[leveloffset=+1]
+
+include::../user-guide/chapter2.adoc[leveloffset=+1]
 
 //--------------------------------------------
 // OBS Admin Guide
