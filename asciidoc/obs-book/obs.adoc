@@ -26,3 +26,16 @@ Here it is, the OBS User Guide.
 == Chapter One
 
 This is Chapter One of the OBS User Guide
+
+//--------------------------------------------
+// OBS Admin Guide
+//--------------------------------------------
+
+= OBS Admin Guide
+
+[partintro]
+Et voila, le OBS Admin Guide.
+
+== Chapter One
+
+This is Chapter One of the OBS Admin Guide
