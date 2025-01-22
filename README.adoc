@@ -1,0 +1,24 @@
+= obs-docu adoc PoC
+
+This is a proof-of-concept (PoC) showing how the existing OBS guides could be
+converted to asciidoc.
+
+== How to see the source code
+
+https://github.com/smithfarm/smithfarm.github.io/tree/main/asciidoc
+
+== How to see the asciidoc as rendered by GitHub
+
+https://github.com/smithfarm/smithfarm.github.io/blob/main/asciidoc/obs-book/obs.adoc
+
+== How to see the "final product" rendered to GitHub Pages
+
+https://smithfarm.github.io
+
+== How to test/build locally
+
+The beauty of this solution is that running test builds locally is not necessary,
+because one can see the rendered asciidoc in GitHub.
+
+That said, I do intend to include here instructions on how to bring up the toolchain
+locally, without relying on some random container from who-knows-where.
