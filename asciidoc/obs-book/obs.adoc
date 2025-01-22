@@ -14,12 +14,6 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-// This order is important because the versions defined in the version.adoc
-// may be referenced in links.adoc.
-
-[preface]
-include::./welcome.adoc[leveloffset=+1]
-
 //--------------------------------------------
 // OBS User Guide
 //--------------------------------------------
@@ -27,5 +21,8 @@ include::./welcome.adoc[leveloffset=+1]
 = OBS User Guide
 
 [partintro]
-OBS User Guide here
+Here it is, the OBS User Guide.
 
+== Chapter One
+
+This is Chapter One of the OBS User Guide
