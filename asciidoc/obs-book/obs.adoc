@@ -23,9 +23,7 @@ endif::[]
 [partintro]
 Here it is, the OBS User Guide.
 
-== Chapter One
-
-This is Chapter One of the OBS User Guide
+include::../user-guide/user.adoc[leveloffset=+1]
 
 //--------------------------------------------
 // OBS Admin Guide
@@ -36,6 +34,4 @@ This is Chapter One of the OBS User Guide
 [partintro]
 Et voila, le OBS Admin Guide.
 
-== Chapter One
-
-This is Chapter One of the OBS Admin Guide
+include::../admin-guide/admin.adoc[leveloffset=+1]
