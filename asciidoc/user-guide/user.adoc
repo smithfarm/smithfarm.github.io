@@ -1,7 +1,7 @@
-// OBS Admin Guide
+// OBS User Guide
 
-[#obs-admin]
-= OBS Admin Guide
+[#obs-user]
+= OBS User Guide
 :experimental:
 
 // for GitHub rendering only, do not modify
@@ -14,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-This is the OBS Admin Guide.
+This is the OBS User Guide.
 
 == Section 1
 
