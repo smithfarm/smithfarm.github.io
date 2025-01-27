@@ -40,7 +40,16 @@ HTML book built with REMARKS=0, DRAFT=no and META=0:
 /docs/asciidoc/build/obs/html/obs/
 ----
 
-(In other words, the build put the rendered HTML into `asciidoc/build/obs/html/obs/`
+Since we bound the top-level directory of the git repo to /docs inside the
+container, this just means the build put the rendered HTML into the local
+directory `asciidoc/build/obs/html/obs/`, so that's the one to start serving
+to our browser:
+
+[source,bash]
+----
+cd asciidoc/build/obs/html/obs
+python3 -m http.server
+----
 
 == How to set up a local dev environment without relying on a container
 
