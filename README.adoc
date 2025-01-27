@@ -17,8 +17,29 @@ https://smithfarm.github.io
 
 == How to test/build locally
 
-The beauty of this solution is that running test builds locally is not necessary,
-because one can see the rendered asciidoc in GitHub.
+The beauty of this solution is that running test builds locally is not strictly
+necessary, because one can see the rendered asciidoc in GitHub.
 
-That said, I do intend to include here instructions on how to bring up the toolchain
-locally, without relying on some random container from who-knows-where.
+That said, for any serious work on the OBS documentation, a local build setup
+is essential. The easiest way to build locally is to run the same container
+that the GitHub Pages deploy action uses:
+
+[source,bash]
+----
+# from the top-level directory of the git repo
+podman run -it --rm -v $PWD/:/docs/ registry.opensuse.org/home/atgracey/cnbp/containers/builder:latest bash -c 'cd /docs/asciidoc; daps -v -d DC-obs html'
+----
+
+This should produce output like:
+
+[source,bash]
+----
+HTML book built with REMARKS=0, DRAFT=no and META=0:
+/docs/asciidoc/build/obs/html/obs/
+----
+
+(In other words, the build put the rendered HTML into `asciidoc/build/obs/html/obs/`
+
+== How to set up a local dev environment without relying on a container
+
+??
