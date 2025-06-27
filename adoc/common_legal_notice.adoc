@@ -1,4 +1,4 @@
-== Legal notice
+== Legal Notice
 
 Copyright (C) 2006–2025 SUSE LLC and contributors. All rights reserved. 
 
