@@ -18,7 +18,8 @@ https://smithfarm.github.io
 == How to test/build locally
 
 The beauty of this solution is that running test builds locally is not strictly
-necessary, because one can see the rendered asciidoc in GitHub.
+necessary, because one can see a very basic rendering of the asciidoc sources
+simply by opening an individual `.adoc` file in the GitHub UI.
 
 That said, for any serious work on the OBS documentation, a local build setup
 is essential. The easiest way to build locally is to run the same container
@@ -32,7 +33,20 @@ podman run -it --rm -v $PWD/:/docs/ \
     bash -c 'cd /docs/adoc; daps -v -d DC-obs html'
 ----
 
-This should produce output like:
+[NOTE]
+In order for this to work the first time, it is essential that the `adoc`
+directory be world-writable (e.g., by setting permissions 777). This is
+because the process running in the container will attempt to create a
+subdirectory `build` under `adoc` and this will fail with "Permission denied"
+because the user running the process in the container will map to an unknown
+user in the host system.
+
+[NOTE]
+Once the `build` subdirectory has been created, the permissions on `adoc`
+can be set to 755.
+
+Provided the directory permissions are set correctly, this command should
+produce output like:
 
 [source,bash]
 ----
