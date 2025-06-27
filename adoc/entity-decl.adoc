@@ -1,50 +1,55 @@
-:amd64: AMD64
-:appimg: {obs.ai}
 :exampledomain: example.com
-:exampleuser: `{exampleuser_plain}`
-:exampleuser_mail: {exampleuser_plain}@{exampledomain}
-:exampleuser_plain: geeko
-:exampleuserII: `{exampleuserII_plain}`
-:exampleuserII_mail: {exampleuserII_plain}@{exampledomain}
-:exampleuserII_plain: geeko
-:gh: GitHub
-:gitupstream1: https://github.com/{gitorg}/{sampleprj}
-:leap: {opensuse} Leap
-:obsa: OBS
-:obsbranch1: {obsdnlhome1}:branches
-:obsbranch2: {obsdnlhome2}:branches
-:obsdnlhome1: home:/{obsuser1}
-:obsdnlhome2: home:/{obsuser2}
-:obsdnlurlhome1: {obsrepourl}/{obsdnlhome1}
-:obsdnlurlhome2: {obsrepourl}/{obsdnlhome2}
+:exampleuser1: geeko
+:exampleuser2: tux
+:gitorg: obs-example
+:obsai: AppImage
+:obsuser1: obs{exampleuser1}
+:obsuser2: obs{exampleuser2}
 :obshome1: home:{obsuser1}
 :obshome2: home:{obsuser2}
-:obs: Open Build Service
-:obs.ai: AppImage
+:obsdnlhome1: home:/{obsuser1}
+:obsdnlhome2: home:/{obsuser2}
 :obsrepourl: https://download.opensuse.org/repositories
 :obsrepoviewfile: https://build.opensuse.org/package/view_file/
-:obsuser1: obs{exampleuser_plain}
-:obsuser2: obs{exampleuserII_plain}
-:obsworkdir1: home:{obsuser1}
-:obsworkdir2: home:{obsuser2{
 :opensuse: openSUSE
-:osbs: {opensuse} Build Service
 :osc: osc
+:sampleprj: my-first-obs-package
+:suse: SUSE
+
+:amd64: AMD64
+:appimg: {obsai}
+:exampleuser: {exampleuser1}
+:exampleuser1_mail: {exampleuser1}@{exampledomain}
+:exampleuser_mail: {exampleuser1_mail}
+:exampleuser2_mail: {exampleuser2}@{exampledomain}
+:gh: GitHub
+:gitupstream1: https://github.com/{gitorg}/{sampleprj}
+:intel64: Intel{nbsp}64
+:leap: {opensuse} Leap
+:obsa: OBS
+:obsbranch1: {obshome1}:branches
+:obsbranch2: {obshome2}:branches
+:obsdnlbranch1: {obshome1}:/branches:/
+:obsdnlbranch2: {obshome2}:/branches:/
+:obsdnlurlhome1: {obsrepourl}/{obsdnlhome1}
+:obsdnlurlhome2: {obsrepourl}/{obsdnlhome2}
+:obs: Open Build Service
+:obsworkdir1: home:{obsuser1}
+:obsworkdir2: home:{obsuser2}
+:osbs: {opensuse} Build Service
 :oscbuildcache: /var/tmp/osbuild-packagecache
 :oscbuildpath: /var/tmp/oscbuild
-:osccmd: `{osc}`
+:osccmd: {osc}
 :ppc: POWER
 :prjvers: 0.1.0
-:prompt.root: `root # `
-:prompt.user: `{exampleuser_plain} $ `
-:prompt.user2: `{exampleuserII_plain} $ `
+:promptroot: root #
+:promptuser: {exampleuser1} $
+:promptuser2: {exampleuser2} $
 :referencespec: {obsrepoviewfile}{obshome1}/{sampleprj}/{sampleprj}.spec
 :rhel: Red Hat Enterprise Linux
-:rootuser: `root`
-:sampleprj: my-first-obs-package
+:rootuser: root
 :sle: {suse} Linux Enterprise
-:suse: SUSE
 :tw: {opensuse} Tumbleweed
 :x86: x86
 :yast: YaST
-:zseries: z&nbsp;Systems
+:zseries: z{nbsp}Systems

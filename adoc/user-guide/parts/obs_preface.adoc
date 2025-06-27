@@ -1,0 +1,5 @@
+[preface]
+== About this Guide
+
+include::../../common_intro.adoc[]
+

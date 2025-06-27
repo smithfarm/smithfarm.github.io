@@ -1,0 +1,103 @@
+This guide is part of the {obs} documentation. These books are
+considered to contain only reviewed content, establishing the reference
+documentation of {obsa}.
+
+This guide does not focus on a specific {obsa} version. It is also
+not a replacement of the documentation inside of the
+https://en.opensuse.org/Portal:Build_Service[{opensuse} Wiki].
+However, content from the wiki may be included in these books in a
+consolidated form.
+
+=== Feedback
+
+If you would like to report an issue with this documentation,
+please use the "Report an issue" links that accompany every
+section header.
+
+Alternatively, you can report an issue by clicking on the 
+following link:
+
+https://github.com/openSUSE/obs-docu/issues/new
+
+If using the latter option, be sure to mention which book
+(and chapter, section, paragraph, etc., if applicable)
+you are taking issue with.
+
+=== Contributing to the Documentation
+
+The {obsa} documentation is written by the community. And you can
+help, too!
+
+Especially as an advanced user or an administrator of {obsa}, there
+will be many topics where you can pitch in even if your English is not
+the most polished. Conversely, if you are not very experienced with
+{obsa} but your English is good: we rely on community editors to
+correct grammatical errors and edit the text for style and clarity.
+
+This guide is written in AsciiDoc, which can be converted to HTML or
+PDF documentation.
+
+To clone the source of this guide, use Git:
+
+....
+git clone https://github.com/openSUSE/obs-docu.git
+....
+
+To learn how to validate and generate the {obsa} documentation, see
+the file `README` in the top level of the git tree.
+
+To submit changes, use GitHub pull requests:
+
+. Fork your own copy of the repository.
+. Commit your changes into the forked repository.
+. Create a pull request. This can be done at
+https://github.com/openSUSE/obs-docu.
+
+=== Typographical Conventions
+
+The following notices and typographical conventions are used in this
+documentation:
+
+* `/etc/passwd`: directory names and file names
+* ++<++PLACEHOLDER++>++: replace ++<++PLACEHOLDER++>++ with the actual
+value
+* `PATH`: the environment variable PATH
+* `ls`, `--help`: commands, options, and parameters
+* `user`: users or groups
+* `package`: name of a package
+* kbd:[Alt], kbd:[Alt+F1]: a key to press or a key
+combination; keys are shown in uppercase as on a keyboard
+* _File_, _File_ ++>++ _Save As_: menu items, buttons
+* _Dancing Penguins_ (Chapter _Penguins_, ⬆Another Manual):
+This is a reference to a chapter in another manual.
+* Commands that must be run with {rootuser} privileges. Often you
+can also prefix these commands with the `sudo` command to run them as
+non-privileged user.
++
+[subs="+attributes"]
+....
+{promptroot} command
+{promptuser} sudo command
+....
+* Commands that can be run by non-privileged users.
++
+[subs="+attributes"]
+....
+{promptuser} command
+....
+* Admonitions
++
+[WARNING]
+====
+Vital information you must be aware of before proceeding. Warns you
+about security issues, potential loss of data, damage to hardware, or
+physical hazards.
+====
++
+CAUTION: Caution boxes admonish you to exercise care and vigilance.
++
+IMPORTANT: Important information you should be aware of before proceeding.
++
+NOTE: Supplemental information, for example about differences in software versions.
++
+TIP: Helpful information, like a guideline or a piece of practical advice.

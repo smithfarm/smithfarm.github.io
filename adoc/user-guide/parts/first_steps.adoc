@@ -1,0 +1,901 @@
+[[art-obs-bg]]
+== First Steps: A Beginnerʼs Guide
+
+[[sec-obsbg-targetaudience]]
+=== Target Audience
+
+This document is intended for users and developers interested in
+building packages from source code for different platforms and Linux
+distributions. Basic knowledge of Linux and the command line usage is
+recommended.
+
+// toms 2017-08-03: Add some links to basic tutorials etc.?
+
+[[sec-obsbg-concept]]
+=== Conceptual Overview
+
+Created in 2005, the {obs} ({obsa}) is a generic system for
+building and distributing packages or images from source code in an
+automatic, consistent, and reproducible way. {obsa} can create
+images and installable packages for a wide range of operating systems
+({suse}, Debian, Ubuntu, Red Hat, Windows, etc.) and hardware
+architectures ({x86}, {amd64}, {zseries}, {ppc} etc.).
+
+[[sec-obsbg-concept-pkgspec]]
+==== Build Recipe
+
+To create a package in {obsa}, you need a build recipe which
+contains the following information:
+
+* *Metadata.* The package name and the description are mandatory. Other data
+such as the version, the license, the upstream URL is optional.
+* *Dependencies.* Packages depend on other packages to function properly. These
+relationships are referred to as "dependencies". There are two types of
+dependencies: _build dependencies_ and _runtime dependencies_. Build
+dependencies are packages that must be present at build time in order to
+successfully build your source package. The act of building your source package
+will create one or more binary packages. Each binary package can specify some
+number of runtime dependencies (packages that your software needs to be present
+at runtime), and the package manager will try to install these together with
+your package. Both types of dependencies - build and runtime - are specified in
+the build recipe. Exactly how this is done is described in the documentation of
+the build system (RPM, Debian, etc.) in question and is beyond the scope of
+this {obs} documentation. You need to look up documentation of the individual
+package managers like https://rpm.org/ or
+https://www.debian.org/doc/devel-manuals#packaging-tutorial
+* *A Package List.* To successfully install and remove a package and all its
+contents, the package manager needs to know which files and directories
+belong to which package.
+
+For RPM-based operating systems such as {opensuse}, {sle}, or
+{rhel}, all the information above is included in a file with the
+file extension `.spec`.
+
+[[sec-obsbg-buildhost]]
+==== Build Hosts and Packages
+
+The {obsa} server provides a Web interface and an API. The API is
+used by the `{osccmd}` command-line tool.
+
+To build the package, the back end creates a sandbox with the respective
+distribution. This sandbox is isolated from the rest of the host system.
+Depending on the build recipe (on RPM-based systems, this is a spec
+file), other packages are downloaded and installed prior to building.
+
+The build process executes all the instructions that it finds in the
+build recipe. If the build is successful, the files which belong to the
+package are installed into the sandbox. From those sandboxed files, the
+final RPM package is created and moved into a download area, the
+_download repository_.
+
+End users can install the package using their preferred package
+management tools. On a {suse}-based system, you can use {yast}
+or Zypper command-line tool to install an RPM version of the package.
+
+Other {obsa}-related services (like the notification server, mirror
+interface, etc.) perform very specific tasks and therefore beyond the
+scope of this guide.
+
+The following schematic shows the components in context:
+
+.Conceptual Overview of {obs}
+[#fig-obsbg-concept]
+image::obs-concept.svg[obs-concept,scaledwidth=80.0%]
+
+[[sec-obsbg-project]]
+==== Projects and Packages
+
+In {obsa}, packages are organized in _projects_. A single project
+can contain several packages, and it usually serves a specific
+organizational purpose. Generic access control, related repositories,
+and build targets (operating systems and architectures) are all defined
+on the project level.
+
+Projects can also have other projects (subprojects) to structure work.
+They are mostly isolated from their parent project and can be configured
+individually.
+
+Each project name is separated by colon. For example, in the {osbs},
+packages for fonts are collected in the project `M17N:fonts` which is a
+subproject of `M17N`. Packages for the Python programming language are
+available in the `devel:languages:python` project which is a subproject of
+`devel:languages` which itself is a subproject of `devel`.
+
+As a user, you will normally build packages in your home project,
+available in {obsa} as `home:USERNAME`. Home projects serve as a personal
+working area in {obsa} to define build targets, upload, build, and
+download packages. Users are also permitted to create subprojects for
+temporary subprojects to work on other people's packages.
+
+Sometimes, you will see the `obs://DOMAIN/PROJECT` notation. The `obs://`
+schema is a shorthand to abbreviate the long URL and needs to be replaced by
+the real {obsa} instance URL.
+
+[[sec-obsbg-req]]
+=== Requirements for Working with the `{osccmd}` Command-Line Tool
+
+Before you start working with {obs}, make sure that you have met
+the following requirements:
+
+Software Requirements::
+  Install the `{osccmd}` command line tool from your preferred
+  distributions or from the {obsa} project `openSUSE:Tools`:
+  * On {suse} systems, install the `{osccmd}` package using a command
+    like `zypper install osc`.
+  * On other systems, use your preferred package manager.
+  * As an alternative, you can use the {osc} {appimg} file. An
+    {appimg} file is a packaged application which can run on many
+    distributions. Download the file from
+    https://download.opensuse.org/repositories/openSUSE:/Tools/AppImage/,
+    save it in your `~/bin` directory, and make the file executable.
+
+Hardware Requirements::
+  Make sure you have a minimum of 1 GB of free disk space for building
+  packages locally and caching downloaded build dependencies. `{osccmd}` builds
+  packages locally under `{oscbuildpath}` and caches downloaded packages under
+  `{oscbuildcache}`.
+
+[[sec-obsbg-usagescenarios]]
+=== Covered Scenarios
+
+This guide is based on the following assumptions:
+
+* Since Git is used throughout this guide, and many {obsa} concepts
+are modeled after their Subversion (SVN) equivalents, you have a working
+knowledge of version control systems such as Git and Subversion (SVN).
+* You are using the {osbs} at https://build.opensuse.org. If you are
+using another {obsa} instance, some commands may differ.
+* You have an account on an {obs} instance.
+* You are running an RPM-based operating system like {opensuse} or
+{sle}.
+* You have configured your system for {obsa} as shown in <<sec-obsbg-obsconfig>>.
+
+All examples use the following elements:
+
+* A user on a local machine (you) called `{exampleuser}`. This user
+builds packages on their own machine.
+* An {obsa} user called `{obsuser1}` with home project `{obshome1}`
+on the {obs}. This user is the same as the system user `{exampleuser1}`,
+that is, you.
+* An {obsa} user `{obsuser2}` and their home `{obshome2}` on {obs}.
+This user acts as a collaborator.
+* An example upstream open source repository at
+link:{gitupstream1}[{gitupstream1}]. This repository contains source
+code in the C{plus}{plus} programming language.
+
+This guide describes the following common tasks:
+
+link:#sec-obsbg-uc-setuphome[Setting Up Your Home Project for the First Time]::
+  Setting up a home project using the {obsa} Web UI.
+
+link:#sec-obsbg-uc-newprj[Creating a New Package Within Your Home Project]::
+  Creating packages from a repository hosted on {gh}.
+
+link:#sec-obsbg-uc-patching[Patching Source Code]::
+  Patching source code without touching the original source.
+
+link:#sec-obsbg-uc-branchprj[Branching a Package]::
+  Branching a project, making changes, and submitting back the changes
+  to the original project.
+
+link:#sec-obsbg-uc-install-from-obs[Installing Packages from {obsa}]::
+  Integrating the download repository into your system and installing
+  your built package.
+
+[[sec-obsbg-obsconfig]]
+=== Configuring Your System for {obsa}
+
+While it is possible to use the `{osccmd}` tool without any
+configuration, it is recommended to set up your system as described
+below.
+
+After all dependencies are downloaded and before the actual build
+process can start, you need to enter the {rootuser} password. This
+can be inconvenient when you rebuild packages frequently. The
+configuration below modifies the `sudo` configuration to allow building
+packages without entering the {rootuser} password. To maximize
+security, only specific users can have root privileges.
+
+Follow the steps below to customize `sudo`.
+
+. Log in as {rootuser} and create a new group `osc`. This group will
+contain all users which are allowed to build packages:
++
+[subs="+attributes"]
+....
+{promptroot} groupadd osc
+....
+. Add users to your newly created group `osc` which are allowed to build
+packages:
++
+[subs="+attributes"]
+....
+{promptroot} usermod -a -G osc {exampleuser1}
+....
++
+Repeat this step to add other users, if necessary.
+. Run `visudo` to create the sudoers file `/etc/sudoers.d/osc`:
++
+[subs="+attributes"]
+....
+{promptroot} visudo -f /etc/sudoers.d/osc
+....
+. Add the following lines to create a command alias that can be executed
+only by the `osc` group:
++
+[subs="+attributes"]
+....
+# sudoers file "/etc/sudoers.d/osc" for the osc group
+Cmnd_Alias  OSC_CMD = /usr/bin/osc, /usr/bin/build
+%osc  ALL = (ALL) NOPASSWD:OSC_CMD
+....
+. Log out of your system and log in again to apply the changes.
+. Create a new {obsa} configuration file:
++
+[subs="+attributes"]
+....
+{promptuser} osc ls {obshome1}
+....
++
+If you run the command for the first time, you will be prompted to enter
+your {obsa} user name and {obsa} password.
+
+[NOTE]
+.Alternative Directory Structure
+====
+If you prefer to separate projects and subprojects in directories and
+subdirectories, change the following line in your configuration file
+`~/.oscrc`:
+
+....
+checkout_no_colon = 1
+....
+
+This will use an alternate layout when checking out a project. For
+example, setting the option above and checking out the home project will
+generate the `home/{obsuser1}` directory structure instead of the
+single `{obshome1}` directory.
+
+However, this guide uses the default configuration with colons.
+====
+
+[[sec-obsbg-uc-setuphome]]
+=== Setting Up Your Home Project for the First Time
+
+This section shows how to set up your home project after creating an
+{opensuse} account.
+
+When you log in to your home project for the first time, it will be
+empty. To build packages, you need to select build targets (operating
+systems and architectures) first. Build targets are defined project-wide
+and every package in a project is built for each build target. However,
+you can disable build targets for a specific package.
+
+You can set up your home project using the {obs} web UI as follows:
+
+. Log in to the {obs} instance.
+. Click the Your Home Project link in the Places menu on the left.
+. Click the Repositories tab, then the Add from a Distribution link.
+. Select the distributions you want to build for.
++
+{obsa} shows several Linux distributions. For {suse}
+distributions, it is recommended to activate at least {tw} and the
+latest {leap} release.
++
+When you select a distribution, {obsa} shows a message that the
+distribution has been successfully added it to your home project.
+. Click the Overview tab to see the available build targets on the right
+side.
+
+To add more build targets, repeat the procedure above.
+
+To fine tune your build targets, click the Repositories tab, find the
+respective build target, and click the Edit repository link. This shows
+the available architectures and additional package repositories you can
+add.
+
+// toms 2017-08-14: Maybe add a screenshot of the Web UI?
+
+[[sec-obsbg-uc-newprj]]
+=== Creating a New Package Within Your Home Project
+
+This section demonstrates how to create packages for different
+{suse} distributions from some simple C{plus}{plus} source code
+hosted on {gh} (the "`upstream repository`").
+
+[NOTE]
+.Check the License First
+====
+Before building, go to the upstream homepage or documentation and check
+the license.
+
+For example, in the {osbs}, you may only redistribute source code
+which was distributed to you under an open source license. If you are
+submitting a package to {opensuse}, its source code will be checked
+for license compliance. If your package is not released under an open
+source license, it will be rejected.
+
+You can find a list of already used licenses in {obsa} at
+https://license.opensuse.org. For more details and a comparison of open
+source licenses in general, see
+https://en.wikipedia.org/wiki/Comparison_of_free_and_open-source_software_licenses.
+====
+
+To create a package from the upstream repository, follow the steps
+below.
+
+. Set up your home project as shown in <<sec-obsbg-uc-setuphome>>.
+. In the terminal, choose or create a directory on a local partition
+that has enough space to hold the package sources.
+. Check out your home project:
++
+[subs="+attributes"]
+....
+{promptuser} osc checkout {obshome1}
+....
++
+This creates an empty `{obsworkdir1}` directory in the current
+directory.
+. Create a new package in your local working directory:
++
+[subs="+attributes"]
+....
+{promptuser} cd {obsworkdir1}
+{promptuser} osc mkpac {sampleprj}
+....
+. Get the source code from the upstream repository:
++
+In our example, the upstream repository is hosted on {gh} and you
+can use the following URL:
+link:{gitupstream1}/releases[{gitupstream1}/releases]. Download the
+tarball ("`Source code (tar.gz)`") and save it in the local directory 
+`{obsworkdir1}/{sampleprj}`. (If there is 
+no published release, click the _Clone or download_ button and download
+the latest sources using the _Download ZIP_ link.)
+. Create the build recipe. This file contains metadata and build
+instructions.
++
+In this example, we are building an RPM for {opensuse}. For
+RPM-based distributions, we create a _spec file_. The skeleton of such a
+spec file looks like this:
++
+[[ex-obsbg-uc-basicprj-skeletonspec]]
+Skeleton of a Spec File
++
+[subs="+attributes"]
+....
+#
+# spec file for package {sampleprj}
+#
+# -- Copyright omitted --
+
+Name:           {sampleprj} <1>
+Version:        {prjvers}
+Release:        0
+License:        GPL-3.0
+Group:          Documentation
+Summary:        Frobnication Tool
+Url:            {gitupstream1}
+Source:         {sampleprj}-%\{version}.tar.gz
+BuildRequires:  gcc <2>
+BuildRequires:  cmake
+BuildRoot:      %\{_tmppath}/%\{name}-%\{version}-build
+
+%description <3>
+This tool frobnicates the bar with the foo when choosing the baz.
+
+%prep <4>
+%setup -q -n %\{name}-%\{version}
+
+%build <5>
+
+%install <6>
+
+%files <7>
+%defattr(-,root,root,-)
+%doc README LICENSE *.txt
+%\{_bindir}/*
+
+%changelog <8>
+....
+<1> *The Header.* Metadata like package name, version, release, license, the
+RPM group, a brief summary, the upstream URL, and the name of the source file.
+<2> *Build Requirements.* Lists package dependencies that are required for
+building. The listed packages are downloaded and installed before building the
+package.
+<3> *The Description Section.* Describes the purpose of the package and gives a
+comprehensive explanation.
+<4> *The Preparation Section.* Prepares the sources for building. This usually
+includes unpacking them with the `%setup` macro and patching them using the
+`%patch` macro. (For more information about patching, see
+<<sec-obsbg-uc-patching>>.)
+<5> *The Build Section.* Contains commands or RPM macros for building the package.
+<6> *The Install Section.* Contains commands or RPM macros which create
+directories or copy files to the installation location.
+<7> *The Files Section.* Lists all files and directories which belong to the
+package.  Documentation-related files are marked with `%doc`, and they are
+automatically installed in the default documentation directory.
+<8> *The Changelog Section.* This section is usually empty. Instead, {obsa}
+searches for a file with the extension `.changes`. If such a file exists in the
+project directory, it will be automatically included as a changelog. The
+changelog file itself contains a high level overview of the history of the
+package.
++
+For the complete spec file, see {referencespec}.
+. Create a changelog file:
++
+[subs="+attributes"]
+....
+{promptuser} osc vc
+....
++
+This command opens a text file with the following content in the default
+editor:
++
+[subs="+attributes"]
+....
+-------------------------------------------------------------------
+Fri Aug 23 12:31:41 UTC 2017 - {exampleuser_mail}
+....
++
+Add a short summary of your changes. Usually, a changelog entry contains
+a high-level overview such as the version of the software in the
+package, which patches you applied, and other changes in your project.
++
+Save the file and leave the editor. `{osccmd}` then creates the file
+`{sampleprj}.changes`.
++
+Your project directory should now look something like this:
++
+[subs="+attributes"]
+....
+project directory
+     ├── {sampleprj}-{prjvers}.tar.gz
+     ├── {sampleprj}.changes
+     └── {sampleprj}.spec
+....
+. Add all the files to your working directory:
++
+[subs="+attributes"]
+....
+{promptuser} osc add *.spec *.changes *.tar.gz
+....
+. Build the package for the default build target:
++
+[subs="+attributes"]
+....
+{promptuser} osc build --local-package 
+....
++
+NOTE: The option `--local-package` is used here, because the package is not
+yet submitted to {obsa}.
++
+// FIXME: how would the user find out which build targets are available?
+// FIXME: i.e. without parsing the project meta XML?
+// The default build target is set in the {osc} configuration file
+// `~/.oscrc` using the variable `build++_++repository`. On {osbs} this
+// is usually {tw}.
+// +
+// To build the package for another build target, use the following
+// command:
+// +
+// [subs="+attributes"]
+// ....
+// {promptuser} osc build --local-package openSUSE_Tumbleweed x86_64 *.spec
+// ....
+. Check whether your build was successful. If everything was fine,
+commit the files to your package to your home project on {obsa}:
++
+[subs="+attributes"]
+....
+{promptuser} osc commit
+....
++
+This command commits the source code changes to the {obsa} server and triggers
+server-side builds there for all configured repositories and architectures.
+To see which repositories and architectures are configured, issue the following
+command:
++
+[subs="+attributes"]
+....
+{promptuser} osc repositories
+....
++
+// toms 2017-08-17: FIXME: Link to User Guide? Troubleshooting section with
+// chroot and buildlog specialties?
++
+If you encounter build errors or would like to take a closer look at those parts
+of the build log which have disappeared from your scroll buffer, use the `osc
+buildlog` (alias `osc bl`) command to review the local build log:
++
+[subs="+attributes"]
+....
+{promptuser} osc buildlog openSUSE_Tumbleweed x86_64
+....
++
+Use the analogous `osc remotebuildlog` (alias `osc rbl`) command to review logs
+from the server-side builds.
+
+[[sec-obsbg-uc-patching]]
+=== Patching Source Code
+
+This section describes how to tell {obs} to apply a patch to your
+package before building it. We use the same package as shown in
+<<sec-obsbg-uc-newprj>>.
+
+There are various reasons why you might want to patch a package:
+
+* *You Do Not Have Permission to Commit Upstream.* Often, you cannot commit
+  changes directly to the upstream repository. If you send changes to the
+upstream repository, they may be integrated late or even be rejected.
++
+Patch files allow making changes while keeping source code clean while
+insulating your package from upstream's release cycle, coding style, and
+internal workings.
+* *Apply Security and Bug Fixes or Distribution-Specific Fixes.*
+* *Change the Source Code, So It Builds on {obsa}.*
+* *Improve Security and Traceability.* Untouched source code in {obsa} is
+  easier to check for changes than a modified one. The check is usually done
+  with a checksum (MD5 or SHA).
+* *Improve Structure and Consistency.* From an organizational point of view, it
+  is better when changes are separated from the source code. With the changes
+  inside the patch file, everybody can see _what_ was changed and which files
+  changes were applied to.
+
+We assume that you already have a project as described in
+<<sec-obsbg-uc-newprj>>. The project directory should look similar to this:
+
+[subs="+attributes"]
+....
+project directory
+├── {sampleprj}-{prjvers}.tar.gz
+├── {sampleprj}.changes
+└── {sampleprj}.spec
+....
+
+In our case, we want to modify the source code under `src/main.cpp` to
+change the greeting message.
+
+. In the terminal, switch to your working directory.
+. Prepare a patch file:
+.. Unpack the source code:
++
+[subs="+attributes"]
+....
+{promptuser} tar xvf {sampleprj}-*.tar.gz
+....
++
+If you have downloaded the archive from {gh}, the archive contains a
+directory in the form `NAME-VERSION`. In our case, unpacking the
+downloaded archive results in the `{sampleprj}-{prjvers}/`
+directory.
+.. Switch to the directory `{sampleprj}-{prjvers}/` and make a
+copy of the original C{plus}{plus} source file:
++
+[subs="+attributes"]
+....
+{promptuser} cd {sampleprj}-{prjvers}/
+{promptuser} cp src/main.cpp src/main.cpp.orig
+....
+.. Make your changes in `src/main.cpp`.
+.. Create a diff and carefully inspect your changes:
++
+[subs="+attributes"]
+....
+{promptuser} diff -u src/main.cpp.orig src/main.cpp
+....
++
+The output should look like this:
++
+[source,diff]
+----
+--- src/main.cpp.orig   2017-08-09 16:28:31.407449707 +0200
++++ src/main.cpp        2017-08-09 16:28:49.131541230 +0200
+@@ -2,7 +2,7 @@
+
+ int main()
+ {
+-    std::cout{lt}{lt}"Hello OBS!\n";
++    std::cout{lt}{lt}"Hello Alice!\n";
+
+     return 0;
+ }
+----
+.. Redirect the diff into a file:
++
+[subs="+attributes"]
+....
+{promptuser} diff -u src/main.cpp.orig src/main.cpp \
+  > ../{sampleprj}_main.diff
+....
++
+You can use an arbitrary name for the patch file. However, we recommend
+giving the file a descriptive name and adding the name of the upstream
+project. If there is a bug or issue number associated with the patch,
+add it to the file name as well. You can either use `.diff` or `.patch`
+as the file extension.
+.. You can now remove the directory `{sampleprj}-{prjvers}/`, as
+it is not needed anymore.
+. Open your spec file and add the following line in the header under the
+`Source` line like this:
++
+[subs="+attributes"]
+....
+Source:         {sampleprj}-%\{version}.tar.gz
+Patch0:         {sampleprj}_main.diff
+....
+. In the `%prep` section, add the `%patch` macro:
++
+[subs="+attributes"]
+....
+%prep
+%setup -q -n %\{name}-%\{version}
+%patch -P 0
+....
+. Add your patch file to the local repository:
++
+[subs="+attributes"]
+....
+{promptuser} osc add {sampleprj}_main.diff
+....
+. Rebuild your package:
++
+[subs="+attributes"]
+....
+{promptuser} osc build
+....
+. If everything was successful, commit your changes:
++
+[subs="+attributes"]
+....
+{promptuser} osc commit
+....
++
+When prompted, specify and save a commit message.
+
+If you are dealing with a lot of patches, you might find the `quilt`
+tool useful. For more information about `quilt`, see
+https://savannah.nongnu.org/projects/quilt.
+
+[[sec-obsbg-uc-branchprj]]
+=== Branching a Package
+
+This section describes how to collaborate between projects. You can
+branch any package in {obsa} into any project that you have write
+permission for. By default, new branches are created as a subproject of
+your home project. These default branches have names beginning with
+`{obsbranch1}`.
+
+There are different reasons to branch a package:
+
+* To modify the source code of the package, build it, try the effect of the
+changes, and submit them back to the original project. Usually,
+you use this workflow when you do not have write permissions for a
+project.
+* To make changes without affecting the original project.
+* To apply temporary changes to try out a different path of development.
+
+Let us assume that there is an {obsa} user `{obsuser1}` who has created
+a package `{obshome1}/{sampleprj}` on
+{obsa}. Now, a second user, `{obsuser2}`, would like to submit a
+code change request to that package.
+
+Now, imagine that you are `{obsuser2}` and you would like to branch
+{obsuser1}'s package into your home project and work on it:
+
+. In the terminal, choose or create a directory on a local partition
+with enough free space.
+. Create a branch from {obsuser1}'s home project:
++
+[subs="+attributes"]
+....
+{promptuser2} osc branchco {obshome1} {sampleprj}
+....
++
+This creates a project `{obsbranch2}:{obshome1}` in {obsa}, and in it
+a package {sampleprj}. It also checks this package out
+locally, creating a local directory `{obsbranch2}:{obshome1}/{sampleprj}` 
+. Change the working directory to that local checkout:
++
+[subs="+attributes"]
+....
+{promptuser2} cd {obsbranch2}:{obshome1}/{sampleprj}
+....
+. Make changes as shown in <<sec-obsbg-uc-patching>>.
+. Build the package for the default build target:
++
+[subs="+attributes"]
+....
+{promptuser} osc build
+....
++
+NOTE: In this case, we do not use the option `--local-package` because the package
+exists server-side on {obsa}, having been created there by the `osc branchco`
+command we just ran.
++
+. Review the build log:
++
+[subs="+attributes"]
+....
+{promptuser} osc buildlog openSUSE_Tumbleweed x86_64
+....
+. Make sure all included and removed files are added to the {obsa}
+repository:
++
+[subs="+attributes"]
+....
+{promptuser2} osc addremove
+....
+. If everything was successful, commit your changes:
++
+[subs="+attributes"]
+....
+{promptuser} osc commit
+....
++
+When prompted, specify and save a commit message.
+. Submit the changes for approval by creating a submitrequest ("`SR`"):
++
+[subs="+attributes"]
+....
+{promptuser2} osc sr
+....
++
+Used like this without any arguments, the `osc sr` (`osc submitreq`) command
+submits the package back to where you originally branched it from.
++
+NOTE: With the `osc sr` command, you submit a specific version of the source.
+If you commit changes later, before the earlier SR gets accepted, {osc} will
+detect the earlier SR and ask you whether you want to supersede it with the
+newer source.
++
+If you would rather be explicit about what to submit and where to submit it
+to, use the full syntax `osc sr SOURCEPRJ PKG DESTPRJ` - i.e., in the present case:
++
+[subs="+attributes"]
+....
+{promptuser2} osc sr {obsbranch2}:{obshome1} {sampleprj} {obshome1}
+....
+
+User `{obsuser2}` has finished the task now and the SR is assigned to
+`{obsuser1}`. User `{obsuser1}` can now either accept or decline it. Also, as
+long as the SR remains open, `{obsuser2}` can also supersede it with a new
+request to reflect any additional code changes that may be needed:
+
+* *Accept the SR.* The changes from user `{obsuser2}` will be
+  integrated into the {obshome1} project. The accepted SR will be
+  closed. To make further changes, {obsuser2} will to create a new
+  SR.
+* *Decline the SR.* The changes from user `{obsuser2}` are not integrated into
+  the {obshome1} project, but that user can still address the reasons why
+  the original SR was declined and supersede it with a new SR.
++
+Reasons for declining a submit requires can be build errors or style
+issues. The reviewer usually gives a reason when declining the submit
+request. User {obsuser2} can then 1) correct their submission using
+a new submit request that supersedes the previous one, 2) disagree and
+reopen the request, or 3) accept the decline and revoke the request.
+* *Supersede the SR.* As long as the SR is still open (and this includes the
+  case when it has been declined), `{obsuser2}` can continue making changes in
+  their local checkout and, at any time, issue a new submit request using the
+  above workflow. At submission time, {obsa} will detect the existing (previous)
+  SR and ask the submitter whether they would like to supersede it. If
+  `{obsuser2}` answers "yes" here, the new SR will supersede the previous one.
+  Alternatively, by answering "no" to the supersede question, a second SR will be
+  created alongside the previous one.
+
+User `{obsuser1}` is responsible for the following:
+
+NOTE: If preferred, the below steps can also be performed using the OBS web UI.
+Requests can be managed under the Tasks tab.
+
+. Show all open SRs targeting your home project
++
+[subs="+attributes"]
+....
+{promptuser} osc rq list -P {obshome1}
+....
+. Find the correct SR. Once you know the SR number:
++
+[subs="+attributes"]
+....
+{promptuser} osc request show 246
+....
+. Review the SR and decide:
++
+Accept the submit request:
++
+[subs="+attributes"]
+....
+{promptuser} osc rq accept 246 --message="Reviewed OK."
+....
++
+Decline the SR and give a reason:
++
+[subs="+attributes"]
+....
+{promptuser} osc rq decline 256 --message="Declined, because of missing semicolon."
+....
+
+When the SR is accepted, the changes in the SR are integrated
+into the target package (`{obshome1}/{sampleprj}` in this case).
+
+If the SR is declined, the submitter can fix the issues and
+resubmit the package. When creating a new SR for to resubmit
+updated code changes, the submitter would answer "yes" when {osc}
+prompts to supersede the previous SR.
+
+[[sec-obsbg-uc-install-from-obs]]
+=== Installing Packages from {obsa}
+
+Projects on {obsa} can be configured to create _download repositories_ containing the
+binary packages (RPMs, DEBs, etc.) produced when it builds your sources.
+These repositories can be as installation sources for distro-specific package management
+utilities such as Zypper, YaST, apt-get, yum, etc.
+
+The process of creating and updating download repositories is called "publishing".
+
+Normally, when you create a package in your {obsa} home project, after a
+successful server-side build the {obsa} will "publish" the build artifacts
+to repositories. In our example, these repositories appear as directories
+at the URL link:{obsdnlurlhome1}[{obsdnlurlhome1}].
+
+However, publishing is not enabled on all projects. For example, projects
+that get created via branching (as in our `osc branchco` example, above)
+have publishing disabled by default. If you need artifacts from server-side
+builds in such projects, you can download them with `osc getbinaries`.
+
+For example, if you have enabled the {tw} distribution, all packages
+for {tw} will be published at
+link:{obsdnlurlhome1}/openSUSE_Tumbleweed[{obsdnlurlhome1}/openSUSE++_++Tumbleweed].
+
+Let's assume you are running {tw} and you wish to install the {sampleprj}
+package from your home project. Also, when newer builds of the package are
+published, you would like your system to download and install them
+automatically when updating installed packages:
+
+. Inside your working directory, determine the download repository URLs:
++
+[subs="+attributes"]
+....
+{promptuser} osc repourls
+{obsdnlurlhome1}/openSUSE_Tumbleweed/{obshome1}.repo
+{obsdnlurlhome1}/openSUSE_42.2/{obshome1}.repo
+....
+. Copy the desired URL of your preferred distribution. In our case, that
+is the line containing `openSUSE++_++Tumbleweed`.
+. Use `zypper` and add the repo:
++
+[subs="+attributes"]
+....
+{promptroot} zypper addrepo {obsdnlurlhome1}/openSUSE_Tumbleweed/{obshome1}.repo
+....
++
+When prompted, accept the GPG key of the download repository.
+. Install the package:
++
+[subs="+attributes"]
+....
+{promptroot} zypper install {sampleprj}
+....
+
+When a newer build of the package is published, re-running Step 4 again will
+install it. You do not need to execute Step 1, as the repository is already
+configured in your system.
+
+[[sec-obsbg-cheatsheet]]
+=== Other Useful `{osccmd}` Commands
+
+The following list gives you a short overview of frequently used
+`{osccmd}` subcommands that have not yet been mentioned in this guide. For an
+overview of their syntax, use `osc SUBCOMMAND --help`.
+
+`osc diff`::
+  Generates a diff, comparing local changes against the remote
+  {obsa} project.
+`osc list`::
+  Shows source or binaries on an {obsa} server.
+`osc prjresults`::
+  Shows project-wide build results.
+`osc status`::
+  Shows the status of files in your working directory

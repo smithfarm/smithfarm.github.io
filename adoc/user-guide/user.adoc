@@ -2,6 +2,8 @@
 
 [#obs-user]
 = OBS User Guide
+:doctype: book
+:hypens: none
 :experimental:
 
 // for GitHub rendering only, do not modify
@@ -14,16 +16,12 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-This is the OBS User Guide.
+include::../entity-decl.adoc[]
 
-== Section 1
+include::parts/obs_preface.adoc[]
 
-Start content here
+include::parts/first_steps.adoc[]
 
-== Section 2
+include::../common_legal_notice.adoc[]
 
-More content
-
-== Section 3
-
-Even more
+include::../common_gfdl1.2_i.adoc[]
