@@ -1,6 +1,6 @@
 # Sources
-MAIN=obs.adoc
-SRC_DIR=obs-book
+MAIN=admin.adoc
+SRC_DIR=admin-guide
 IMG_SRC_DIR=images
 
 
