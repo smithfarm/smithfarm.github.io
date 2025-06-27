@@ -5,11 +5,11 @@ converted to asciidoc.
 
 == How to see the source code
 
-https://github.com/smithfarm/smithfarm.github.io/tree/main/asciidoc
+https://github.com/smithfarm/smithfarm.github.io/tree/main/adoc
 
 == How to see the asciidoc as rendered by GitHub
 
-https://github.com/smithfarm/smithfarm.github.io/blob/main/asciidoc/obs-book/obs.adoc
+https://github.com/smithfarm/smithfarm.github.io/blob/main/adoc/obs-book/obs.adoc
 
 == How to see the "final product" rendered to GitHub Pages
 
@@ -29,7 +29,7 @@ that the GitHub Pages deploy action uses:
 # from the top-level directory of the git repo
 podman run -it --rm -v $PWD/:/docs/ \
     registry.opensuse.org/home/atgracey/cnbp/containers/builder:latest \
-    bash -c 'cd /docs/asciidoc; daps -v -d DC-obs html'
+    bash -c 'cd /docs/adoc; daps -v -d DC-obs html'
 ----
 
 This should produce output like:
@@ -37,17 +37,17 @@ This should produce output like:
 [source,bash]
 ----
 HTML book built with REMARKS=0, DRAFT=no and META=0:
-/docs/asciidoc/build/obs/html/obs/
+/docs/adoc/build/obs/html/obs/
 ----
 
 Since we bound the top-level directory of the git repo to /docs inside the
 container, this just means the build put the rendered HTML into the local
-directory `asciidoc/build/obs/html/obs/`, so that's the one to start serving
+directory `adoc/build/obs/html/obs/`, so that's the one to start serving
 to our browser:
 
 [source,bash]
 ----
-cd asciidoc/build/obs/html/obs
+cd adoc/build/obs/html/obs
 python3 -m http.server
 ----
 
