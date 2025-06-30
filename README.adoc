@@ -7,9 +7,13 @@ converted to asciidoc.
 
 https://github.com/smithfarm/smithfarm.github.io/tree/main/adoc
 
-== How to see the asciidoc as rendered by GitHub
+Click on any `.adoc` file in the source code tree and GitHub will display a
+basic rendering. From there, click on the "Raw" button (in the upper right
+corner, more or less) to see the underlying ("raw") AsciiDoc source code.
 
-https://github.com/smithfarm/smithfarm.github.io/blob/main/adoc/obs-book/obs.adoc
+For example:
+
+https://github.com/smithfarm/smithfarm.github.io/blob/main/adoc/user-guide/parts/first_steps.adoc
 
 == How to see the "final product" rendered to GitHub Pages
 
