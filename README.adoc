@@ -19,6 +19,12 @@ https://github.com/smithfarm/smithfarm.github.io/blob/main/adoc/user-guide/parts
 
 https://smithfarm.github.io
 
+== How to see the original documentation for comparison
+
+User Guide: https://openbuildservice.org/help/manuals/obs-user-guide/
+
+Admin Guide: https://openbuildservice.org/help/manuals/obs-admin-guide/
+
 == How to test/build locally
 
 The beauty of this solution is that running test builds locally is not strictly
